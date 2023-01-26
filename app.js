@@ -1,20 +1,25 @@
-const MongoClient = require("mongodb").MongoClient;
+require('dotenv').config();
+const { MongoClient } = require("mongodb");
 
-const DB_COLLECTION_NAME = "schedules"
-const DB_NAME = "DisconnectSchedule"
-const DB_LOGIN = "root"
-const DB_PASSWORD = "example"
-const DB_PORT = "27017"
-const DB_URL = "db.0.brukkil.pp.ua"
 
-const uri = `mongodb://${DB_LOGIN}:${DB_PASSWORD}@${DB_URL}:${DB_PORT}/?maxPoolSize=20&w=majority`;
 
-MongoClient.connect(uri, function (err, db) {
-    if (err) throw err;
-    var dbo = db.db(DB_NAME);
-    dbo.createCollection(DB_COLLECTION_NAME, function (err, res) {
-        if (err) throw err;
-        console.log("Collection created!");
-        db.close();
-    });
-});
+const uri = `mongodb://${process.env.DB_LOGIN}:${process.env.DB_PASSWORD}@${process.env.DB_URL}:${process.env.DB_PORT}/?maxPoolSize=20&w=majority`;
+
+const client = new MongoClient(uri);
+
+
+async function run() {
+    try {
+      const database = client.db(process.env.DB_NAME);
+      const movies = database.collection(process.env.DB_COLLECTION_NAME);
+      const query = {  };
+      const movie = await movies.findOne(query);
+      console.log(movie);
+    } finally {
+      await client.close();
+    }
+  }
+
+
+
+  run().catch(console.error);
